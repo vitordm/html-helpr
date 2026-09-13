@@ -96,6 +96,11 @@ class FormHelper extends HtmlHelper
         return $ret;
     }
 
+    public static function label($label, $id = NULL, $attrs = array())
+    {
+        return self::formatLabel($label, $id, $attrs);
+    }
+
 	/**
 	 * @param       $name
 	 * @param null  $class

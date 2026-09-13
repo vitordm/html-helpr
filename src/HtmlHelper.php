@@ -99,19 +99,7 @@ class HtmlHelper
      */
     public static function tag($type, $text = NULL,  $class = NULL, $id = NULL, $attrs = array())
     {
-        if (!is_array($attrs)) {
-            $attrs = array();
-        }
-
-        $primaryAttrs = array();
-        if ($class !== NULL && $class !== false && $class !== '') {
-            $primaryAttrs['class'] = $class;
-        }
-        if ($id !== NULL && $id !== false && $id !== '') {
-            $primaryAttrs['id'] = $id;
-        }
-
-        $attrs = array_merge($primaryAttrs, $attrs);
+        $attrs = self::buildAttributes($attrs, $class, $id);
 
         $tag = '<';
         $tag .= $type;
@@ -204,6 +192,23 @@ class HtmlHelper
      * @throws HtmlException
      * @return string
      */
+    public static function buildAttributes($attrs = array(), $class = NULL, $id = NULL)
+    {
+        if (!is_array($attrs)) {
+            $attrs = array();
+        }
+
+        $primaryAttrs = array();
+        if ($class !== NULL && $class !== false && $class !== '') {
+            $primaryAttrs['class'] = $class;
+        }
+        if ($id !== NULL && $id !== false && $id !== '') {
+            $primaryAttrs['id'] = $id;
+        }
+
+        return array_merge($primaryAttrs, $attrs);
+    }
+
     protected static function parseAttrs($attrs = array())
     {
         /**
