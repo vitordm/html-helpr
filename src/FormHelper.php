@@ -96,6 +96,11 @@ class FormHelper extends HtmlHelper
         return $ret;
     }
 
+    public static function label($label, $id = NULL, $attrs = array())
+    {
+        return self::formatLabel($label, $id, $attrs);
+    }
+
 	/**
 	 * @param       $name
 	 * @param null  $class
@@ -192,7 +197,7 @@ class FormHelper extends HtmlHelper
     /**
      * Cria Label para algum formulário
      */
-    private function formatLabel($label, $id = NULL, $attrs = array())
+    private static function formatLabel($label, $id = NULL, $attrs = array())
     {
         if($id)
             $attrs['for'] = $id;
