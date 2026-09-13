@@ -192,7 +192,7 @@ class FormHelper extends HtmlHelper
     /**
      * Cria Label para algum formulário
      */
-    private function formatLabel($label, $id = NULL, $attrs = array())
+    private static function formatLabel($label, $id = NULL, $attrs = array())
     {
         if($id)
             $attrs['for'] = $id;

@@ -99,26 +99,38 @@ class HtmlHelper
      */
     public static function tag($type, $text = NULL,  $class = NULL, $id = NULL, $attrs = array())
     {
-        /**
-         * Monta os atributos primários
-         */
-        if($class)
-            $attrs['class'] = $class;
-        if($id)
-            $attrs['id'] = $id;
-        
+        if (!is_array($attrs)) {
+            $attrs = array();
+        }
+
+        $primaryAttrs = array();
+        if ($class !== NULL && $class !== false && $class !== '') {
+            $primaryAttrs['class'] = $class;
+        }
+        if ($id !== NULL && $id !== false && $id !== '') {
+            $primaryAttrs['id'] = $id;
+        }
+
+        $attrs = array_merge($primaryAttrs, $attrs);
+
         $tag = '<';
         $tag .= $type;
-        $tag .= ' ' . self::parseAttrs($attrs);
-        
+
+        $attrString = self::parseAttrs($attrs);
+        if ($attrString !== '') {
+            $tag .= ' ' . $attrString;
+        }
+
         /**
          * Verifica se a tag é dupla ou unica
          */
-        if(!is_null($text) and $text !== false)
+        if (!is_null($text) && $text !== false) {
+            $text = self::escapeHtml($text);
             $tag .= '>' . $text . '</' . $type . '>';
-        else
+        } else {
             $tag .= '/>';
-            
+        }
+
         return $tag;
     }
     
@@ -197,23 +209,49 @@ class HtmlHelper
         /**
          * Verifica se está passando um array correto
          */
-        if(!is_array($attrs))
+        if (!is_array($attrs)) {
             throw new HtmlException('Sem itens para parsear' . __CLASS__ . '::' . __FUNCTION__, 1);
-        
+        }
+
         /**
          * Monta o retorno
          */
-        $return = NULL;
-        foreach($attrs as $atr => $val)
-        {
-            $return .= ' ';
-            $return .= trim($atr) . '="' . $val . '"';
+        $return = array();
+        foreach ($attrs as $atr => $val) {
+            $name = trim((string)$atr);
+            if ($name === '') {
+                continue;
+            }
+
+            if ($val === NULL || $val === false) {
+                continue;
+            }
+
+            if (is_bool($val)) {
+                $val = $val ? 'true' : 'false';
+            }
+
+            $return[] = $name . '="' . self::escapeHtml($val) . '"';
         }
-        
-        $return = trim($return);
-        
-        return $return;
-        
+
+        return implode(' ', $return);
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    protected static function escapeHtml($value)
+    {
+        if (is_scalar($value) || $value === null) {
+            return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+        }
+
+        if (is_array($value)) {
+            return htmlspecialchars(implode(' ', $value), ENT_QUOTES, 'UTF-8');
+        }
+
+        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
     }
 
     /**
@@ -327,9 +365,11 @@ class HtmlHelper
     public static function url($path, $base_path = true)
     {
         $url = null;
-        if($base_path)
-            $url .= self::getBaseSite();
-        $url .= $path;
+        if ($base_path) {
+            $base = self::getBaseSite();
+            $url = rtrim($base, '/') . '/';
+        }
+        $url .= ltrim((string)$path, '/');
 
         return $url;
     }
